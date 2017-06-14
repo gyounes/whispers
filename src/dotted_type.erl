@@ -69,7 +69,7 @@ crdt_size({?DOTTED_EWFLAG_TYPE, CRDT}) -> crdt_size(CRDT);
 crdt_size({?DOTTED_GCOUNTER_TYPE, CRDT}) -> crdt_size(CRDT);
 crdt_size({?DOTTED_GSET_TYPE, CRDT}) -> crdt_size(CRDT);
 crdt_size({?DOTTED_MVREGISTER_TYPE, CRDT}) -> crdt_size(CRDT);
-crdt_size({?DOTTED_WSET_TYPE, CRDT}) -> crdt_size(CRDT);
+crdt_size({?DOTTED_RWSET_TYPE, CRDT}) -> crdt_size(CRDT);
 crdt_size({?DOTTED_PNCOUNTER_TYPE, CRDT}) -> crdt_size(CRDT);
 crdt_size({?DOTTED_TWOPSET_TYPE, CRDT}) -> crdt_size(CRDT);
 crdt_size(T) ->
