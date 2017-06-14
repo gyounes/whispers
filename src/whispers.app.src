@@ -1,0 +1,10 @@
+{application,whispers,
+             [{description,"Variants of Operation-based Conflict-free Replicated Data Types"},
+              {vsn,"0.1.5"},
+              {registered,[]},
+              {applications,[kernel,stdlib,crypto]},
+              {mod,{whispers_app,[]}},
+              {modules,[]},
+              {maintainers,["Georges Younes","Vitor Enes Duarte"]},
+              {licenses,["Apache 2.0"]},
+              {links,[{"Github","https://github.com/gyounes/whispers"}]}]}.
