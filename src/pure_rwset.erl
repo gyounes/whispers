@@ -67,7 +67,7 @@ is_commutative() -> false.
 redundant({VV1, {add, Elem1}}, {VV2, {X, Elem2}}) ->
     case Elem1 =:= Elem2 of
         true ->
-            case pure_trcb:happened_before(VV1, VV2) of
+            case vclock:descends(VV2, VV1) of
                 true ->
                     ?RA;
                 false ->
@@ -87,7 +87,7 @@ redundant({VV1, {add, Elem1}}, {VV2, {X, Elem2}}) ->
 redundant({VV1, {rmv, Elem1}}, {VV2, {X, Elem2}}) ->
     case Elem1 =:= Elem2 of
         true ->
-            case pure_trcb:happened_before(VV1, VV2) of
+            case vclock:descends(VV2, VV1) of
                 true ->
                     ?RA;
                 false ->
@@ -146,7 +146,7 @@ remove_redundant_crystal({_VV1, {_X, Elem}}, {?TYPE, {POLog, RWORSet}}) ->
 check_stability(StableVV, {?TYPE, {POLog0, RWORSet0}}) ->
     {POLog1, RWORSet1} = orddict:fold(
         fun(Key, {Op, Elem}=Value, {AccPOLog, AccORSet}) ->
-            case pure_trcb:happened_before(Key, StableVV) of
+            case vclock:descends(StableVV, Key) of
                 true ->
                     case Op of
                         add ->

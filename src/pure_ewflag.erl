@@ -67,7 +67,7 @@ is_commutative() -> false.
 -spec redundant({pure_type:id(), pure_ewflag_op()}, {pure_type:id(), pure_ewflag_op()}) ->
     atom().
 redundant({VV1, Op1}, {VV2, Op2}) ->
-    case pure_trcb:happened_before(VV1, VV2) of
+    case vclock:descends(VV2, VV1) of
         true ->
             ?RA;
         false ->

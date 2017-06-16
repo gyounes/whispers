@@ -68,7 +68,7 @@ is_commutative() -> false.
 -spec redundant({pure_type:id(), pure_awset_op()}, {pure_type:id(), pure_awset_op()}) ->
     atom().
 redundant({VV1, {add, Elem1}}, {VV2, {_X, Elem2}}) ->
-    case Elem1 =:= Elem2 andalso pure_trcb:happened_before(VV1, VV2) of
+    case Elem1 =:= Elem2 andalso vclock:descends(VV2, VV1) of
         true ->
             ?RA;
         false ->
@@ -110,7 +110,7 @@ remove_redundant_crystal({_VV1, {_X, Elem}}, {?TYPE, {POLog, AWORSet}}) ->
 check_stability(StableVV, {?TYPE, {POLog0, AWORSet0}}) ->
     {POLog1, AWORSet1} = orddict:fold(
         fun(Key, {_Op, Elem}=Value, {AccPOLog, AccORSet}) ->
-            case pure_trcb:happened_before(Key, StableVV) of
+            case vclock:descends(StableVV, Key) of
                 true ->
                     {AccPOLog, ordsets:add_element(Elem, AccORSet)};
                 false ->

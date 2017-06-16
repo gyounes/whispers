@@ -68,7 +68,7 @@ is_commutative() -> false.
 -spec redundant({pure_type:id(), pure_dwflag_op()}, {pure_type:id(), pure_dwflag_op()}) ->
     atom().
 redundant({VV1, Op1}, {VV2, Op2}) ->
-    case pure_trcb:happened_before(VV1, VV2) of
+    case vclock:descends(VV2, VV1) of
         true ->
             ?RA; %% Op1 removed, Op2 added
         false -> %% VV1 and VV2 are concurrent

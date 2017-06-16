@@ -69,7 +69,7 @@ is_commutative() -> false.
 -spec redundant({pure_type:id(), pure_mvregister_op()}, {pure_type:id(), pure_mvregister_op()}) ->
     atom().
 redundant({VV1, _Op1}, {VV2, _Op2}) ->
-    case pure_trcb:happened_before(VV1, VV2) of
+    case vclock:descends(VV2, VV1) of
         true ->
             ?RA;
         false ->
