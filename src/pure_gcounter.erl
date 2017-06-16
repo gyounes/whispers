@@ -41,13 +41,13 @@
 -export_type([pure_gcounter/0, pure_gcounter_op/0]).
 
 -opaque pure_gcounter() :: {?TYPE, payload()}.
--type payload() :: {pure_type:polog(), integer()}.
+-type payload() :: integer().
 -type pure_gcounter_op() :: increment | {increment, non_neg_integer()}.
 
 %% @doc Create a new, empty `pure_gcounter()'
 -spec new() -> pure_gcounter().
 new() ->
-    {?TYPE, {orddict:new(), 0}}.
+    {?TYPE, 0}.
 
 %% @doc Create a new, empty `pure_gcounter()'
 -spec new([term()]) -> pure_gcounter().
@@ -61,21 +61,21 @@ is_commutative() -> true.
 %% @doc Update a `pure_gcounter()'.
 -spec mutate(pure_gcounter_op(), pure_type:id(), pure_gcounter()) ->
     {ok, pure_gcounter()}.
-mutate(increment, _TS, {?TYPE, {POLog, PureGCounter}}) ->
-    PureGCounter1 = {?TYPE, {POLog, PureGCounter + 1}},
+mutate(increment, _TS, {?TYPE, PureGCounter}) ->
+    PureGCounter1 = {?TYPE, PureGCounter + 1},
     {ok, PureGCounter1};
-mutate({increment, Val}, _TS, {?TYPE, {POLog, PureGCounter}}) ->
-    PureGCounter1 = {?TYPE, {POLog, PureGCounter + Val}},
+mutate({increment, Val}, _TS, {?TYPE, PureGCounter}) ->
+    PureGCounter1 = {?TYPE, PureGCounter + Val},
     {ok, PureGCounter1}.
 
 %% @doc Return the value of the `pure_gcounter()'.
 -spec query(pure_gcounter()) -> non_neg_integer().
-query({?TYPE, {_POLog, PureGCounter}}) ->
+query({?TYPE, PureGCounter}) ->
     PureGCounter.
 
 %% @doc Check if two `pure_gcounter()' instances have the same value.
 -spec equal(pure_gcounter(), pure_gcounter()) -> boolean().
-equal({?TYPE, {_POLog1, PureGCounter1}}, {?TYPE, {_POLog2, PureGCounter2}}) ->
+equal({?TYPE, PureGCounter1}, {?TYPE, PureGCounter2}) ->
     PureGCounter1 == PureGCounter2.
 
 %% ===================================================================
@@ -84,11 +84,11 @@ equal({?TYPE, {_POLog1, PureGCounter1}}, {?TYPE, {_POLog2, PureGCounter2}}) ->
 -ifdef(TEST).
 
 new_test() ->
-    ?assertEqual({?TYPE, {[], 0}}, new()).
+    ?assertEqual({?TYPE, 0}, new()).
 
 query_test() ->
     PureGCounter0 = new(),
-    PureGCounter1 = {?TYPE, {[], 15}},
+    PureGCounter1 = {?TYPE, 15},
     ?assertEqual(0, query(PureGCounter0)),
     ?assertEqual(15, query(PureGCounter1)).
 
@@ -97,14 +97,14 @@ increment_test() ->
     {ok, PureGCounter1} = mutate(increment, [], PureGCounter0),
     {ok, PureGCounter2} = mutate(increment, [], PureGCounter1),
     {ok, PureGCounter3} = mutate({increment, 5}, [], PureGCounter2),
-    ?assertEqual({?TYPE, {[], 1}}, PureGCounter1),
-    ?assertEqual({?TYPE, {[], 2}}, PureGCounter2),
-    ?assertEqual({?TYPE, {[], 7}}, PureGCounter3).
+    ?assertEqual({?TYPE, 1}, PureGCounter1),
+    ?assertEqual({?TYPE, 2}, PureGCounter2),
+    ?assertEqual({?TYPE, 7}, PureGCounter3).
 
 equal_test() ->
-    PureGCounter1 = {?TYPE, {[], 1}},
-    PureGCounter2 = {?TYPE, {[], 2}},
-    PureGCounter3 = {?TYPE, {[], 3}},
+    PureGCounter1 = {?TYPE, 1},
+    PureGCounter2 = {?TYPE, 2},
+    PureGCounter3 = {?TYPE, 3},
     ?assert(equal(PureGCounter1, PureGCounter1)),
     ?assertNot(equal(PureGCounter2, PureGCounter1)),
     ?assertNot(equal(PureGCounter2, PureGCounter3)).

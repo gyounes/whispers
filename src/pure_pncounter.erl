@@ -41,13 +41,13 @@
 -export_type([pure_pncounter/0, pure_pncounter_op/0]).
 
 -opaque pure_pncounter() :: {?TYPE, payload()}.
--type payload() :: {pure_type:polog(), integer()}.
+-type payload() :: integer().
 -type pure_pncounter_op() :: increment | decrement | {increment, integer()} | {decrement, integer()}.
 
 %% @doc Create a new, empty `pure_pncounter()'
 -spec new() -> pure_pncounter().
 new() ->
-    {?TYPE, {orddict:new(), 0}}.
+    {?TYPE, 0}.
 
 %% @doc Create a new, empty `pure_pncounter()'
 -spec new([term()]) -> pure_pncounter().
@@ -61,27 +61,27 @@ is_commutative() -> true.
 %% @doc Update a `pure_pncounter()'.
 -spec mutate(pure_pncounter_op(), pure_type:id(), pure_pncounter()) ->
     {ok, pure_pncounter()}.
-mutate(increment, _TS, {?TYPE, {POLog, PurePNCounter}}) ->
-    PurePNCounter1 = {?TYPE, {POLog, PurePNCounter + 1}},
+mutate(increment, _TS, {?TYPE, PurePNCounter}) ->
+    PurePNCounter1 = {?TYPE, PurePNCounter + 1},
     {ok, PurePNCounter1};
-mutate({increment, Val}, _TS, {?TYPE, {POLog, PurePNCounter}}) ->
-    PurePNCounter1 = {?TYPE, {POLog, PurePNCounter + Val}},
+mutate({increment, Val}, _TS, {?TYPE, PurePNCounter}) ->
+    PurePNCounter1 = {?TYPE, PurePNCounter + Val},
     {ok, PurePNCounter1};
-mutate(decrement, _TS, {?TYPE, {POLog, PurePNCounter}}) ->
-    PurePNCounter1 = {?TYPE, {POLog, PurePNCounter - 1}},
+mutate(decrement, _TS, {?TYPE, PurePNCounter}) ->
+    PurePNCounter1 = {?TYPE, PurePNCounter - 1},
     {ok, PurePNCounter1};
-mutate({decrement, Val}, _TS, {?TYPE, {POLog, PurePNCounter}}) ->
-    PurePNCounter1 = {?TYPE, {POLog, PurePNCounter - Val}},
+mutate({decrement, Val}, _TS, {?TYPE, PurePNCounter}) ->
+    PurePNCounter1 = {?TYPE, PurePNCounter - Val},
     {ok, PurePNCounter1}.
 
 %% @doc Return the value of the `pure_pncounter()'.
 -spec query(pure_pncounter()) -> integer().
-query({?TYPE, {_POLog, PurePNCounter}}) ->
+query({?TYPE, PurePNCounter}) ->
     PurePNCounter.
 
 %% @doc Check if two `pure_pncounter()' instances have the same value.
 -spec equal(pure_pncounter(), pure_pncounter()) -> boolean().
-equal({?TYPE, {_POLog1, PurePNCounter1}}, {?TYPE, {_POLog2, PurePNCounter2}}) ->
+equal({?TYPE, PurePNCounter1}, {?TYPE, PurePNCounter2}) ->
     PurePNCounter1 == PurePNCounter2.
 
 %% ===================================================================
@@ -90,11 +90,11 @@ equal({?TYPE, {_POLog1, PurePNCounter1}}, {?TYPE, {_POLog2, PurePNCounter2}}) ->
 -ifdef(TEST).
 
 new_test() ->
-    ?assertEqual({?TYPE, {[], 0}}, new()).
+    ?assertEqual({?TYPE, 0}, new()).
 
 query_test() ->
     PurePNCounter0 = new(),
-    PurePNCounter1 = {?TYPE, {[], 15}},
+    PurePNCounter1 = {?TYPE, 15},
     ?assertEqual(0, query(PurePNCounter0)),
     ?assertEqual(15, query(PurePNCounter1)).
 
@@ -103,25 +103,25 @@ increment_test() ->
     {ok, PurePNCounter1} = mutate(increment, [], PurePNCounter0),
     {ok, PurePNCounter2} = mutate(increment, [], PurePNCounter1),
     {ok, PurePNCounter3} = mutate({increment, 5}, [], PurePNCounter2),
-    ?assertEqual({?TYPE, {[], 1}}, PurePNCounter1),
-    ?assertEqual({?TYPE, {[], 2}}, PurePNCounter2),
-    ?assertEqual({?TYPE, {[], 7}}, PurePNCounter3).
+    ?assertEqual({?TYPE, 1}, PurePNCounter1),
+    ?assertEqual({?TYPE, 2}, PurePNCounter2),
+    ?assertEqual({?TYPE, 7}, PurePNCounter3).
 
 decrement_test() ->
-    PurePNCounter0 = {?TYPE, {[], 1}},
+    PurePNCounter0 = {?TYPE, 1},
     {ok, PurePNCounter1} = mutate(decrement, [], PurePNCounter0),
     {ok, PurePNCounter2} = mutate(decrement, [], PurePNCounter1),
     {ok, PurePNCounter3} = mutate({decrement, 5}, [], PurePNCounter2),
     {ok, PurePNCounter4} = mutate({decrement, -8}, [], PurePNCounter3),
-    ?assertEqual({?TYPE, {[], 0}}, PurePNCounter1),
-    ?assertEqual({?TYPE, {[], -1}}, PurePNCounter2),
-    ?assertEqual({?TYPE, {[], -6}}, PurePNCounter3),
-    ?assertEqual({?TYPE, {[], 2}}, PurePNCounter4).
+    ?assertEqual({?TYPE, 0}, PurePNCounter1),
+    ?assertEqual({?TYPE, -1}, PurePNCounter2),
+    ?assertEqual({?TYPE, -6}, PurePNCounter3),
+    ?assertEqual({?TYPE, 2}, PurePNCounter4).
 
 equal_test() ->
-    PurePNCounter1 = {?TYPE, {[], 1}},
-    PurePNCounter2 = {?TYPE, {[], 2}},
-    PurePNCounter3 = {?TYPE, {[], 3}},
+    PurePNCounter1 = {?TYPE, 1},
+    PurePNCounter2 = {?TYPE, 2},
+    PurePNCounter3 = {?TYPE, 3},
     ?assert(equal(PurePNCounter1, PurePNCounter1)),
     ?assertNot(equal(PurePNCounter2, PurePNCounter1)),
     ?assertNot(equal(PurePNCounter2, PurePNCounter3)).
