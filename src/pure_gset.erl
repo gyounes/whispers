@@ -35,7 +35,7 @@
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
--export([new/0, new/1]).
+-export([new/0, new/1, is_commutative/0]).
 -export([mutate/3, query/1, equal/2, reset/2]).
 
 -export_type([pure_gset/0, pure_gset_op/0]).
@@ -54,17 +54,16 @@ new() ->
 new([]) ->
     new().
 
+%% check if dt is commutative.
+-spec is_commutative() -> boolean().
+is_commutative() -> true.
+
 %% @doc Update a `pure_gset()'.
 -spec mutate(pure_gset_op(), pure_type:id(), pure_gset()) ->
     {ok, pure_gset()}.
-mutate({add, Elem}, _VV, {?TYPE, {POLog, PureGSet}}) ->
+mutate({add, Elem}, _TS, {?TYPE, {POLog, PureGSet}}) ->
     PureGSet1 = {?TYPE, {POLog, ordsets:add_element(Elem, PureGSet)}},
     {ok, PureGSet1}.
-
-%% @doc Clear/reset the state to initial state.
--spec reset(pure_type:id(), pure_gset()) -> pure_gset().
-reset(VV, {?TYPE, _}=CRDT) ->
-    pure_type:reset(VV, CRDT).
 
 %% @doc Returns the value of the `pure_gset()'.
 %%      This value is a set with all the elements in the `pure_gset()'.
@@ -97,11 +96,6 @@ add_test() ->
     {ok, Set2} = mutate({add, <<"b">>}, [], Set1),
     ?assertEqual({?TYPE, {[], [<<"a">>]}}, Set1),
     ?assertEqual({?TYPE, {[], [<<"a">>, <<"b">>]}}, Set2).
-
-reset_test() ->
-    Set1 = {?TYPE, {[], [<<"a">>, <<"b">>]}},
-    Set2 = reset([], Set1),
-    ?assertEqual({?TYPE, {[], []}}, Set2).
 
 equal_test() ->
     Set1 = {?TYPE, {[], [<<"a">>]}},

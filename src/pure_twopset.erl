@@ -35,7 +35,7 @@
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
--export([new/0, new/1]).
+-export([new/0, new/1, is_commutative/0]).
 -export([mutate/3, query/1, equal/2, reset/2]).
 
 -export_type([pure_twopset/0, pure_twopset_op/0]).
@@ -54,10 +54,14 @@ new() ->
 new([]) ->
     new().
 
+%% check if dt is commutative.
+-spec is_commutative() -> boolean().
+is_commutative() -> true.
+
 %% @doc Update a `pure_twopset()'.
 -spec mutate(pure_twopset_op(), pure_type:id(), pure_twopset()) ->
     {ok, pure_twopset()}.
-mutate({add, Elem}, _VV, {?TYPE, {POLog, {Pure2PAddSet, Pure2PRmvSet}}}) ->
+mutate({add, Elem}, _TS, {?TYPE, {POLog, {Pure2PAddSet, Pure2PRmvSet}}}) ->
     AlreadyRemoved = ordsets:is_element(Elem, Pure2PRmvSet),
     case AlreadyRemoved of
         true ->
@@ -66,14 +70,9 @@ mutate({add, Elem}, _VV, {?TYPE, {POLog, {Pure2PAddSet, Pure2PRmvSet}}}) ->
             PureTwoPSet = {?TYPE, {POLog, {ordsets:add_element(Elem, Pure2PAddSet), Pure2PRmvSet}}},
             {ok, PureTwoPSet}
     end;
-mutate({rmv, Elem}, _VV, {?TYPE, {POLog, {Pure2PAddSet, Pure2PRmvSet}}}) ->
+mutate({rmv, Elem}, _TS, {?TYPE, {POLog, {Pure2PAddSet, Pure2PRmvSet}}}) ->
     PureTwoPSet = {?TYPE, {POLog, {ordsets:del_element(Elem, Pure2PAddSet), ordsets:add_element(Elem, Pure2PRmvSet)}}},
     {ok, PureTwoPSet}.
-
-%% @doc Clear/reset the state to initial state.
--spec reset(pure_type:id(), pure_twopset()) -> pure_twopset().
-reset(VV, {?TYPE, _}=CRDT) ->
-    pure_type:reset(VV, CRDT).
 
 %% @doc Returns the value of the `pure_twopset()'.
 %%      This value is a set with all the elements in the `pure_twopset()'.
@@ -117,11 +116,6 @@ rmv_test() ->
     {ok, Set3} = mutate({rmv, <<"c">>}, [], Set1),
     ?assertEqual({?TYPE, {[], {[<<"b">>, <<"c">>], [<<"a">>]}}}, Set2),
     ?assertEqual({?TYPE, {[], {[<<"b">>], [<<"a">>, <<"c">>]}}}, Set3).
-
-reset_test() ->
-    Set1 = {?TYPE, {[], {[<<"b">>, <<"c">>], [<<"a">>, <<"c">>]}}},
-    Set2 = reset([], Set1),
-    ?assertEqual({?TYPE, {[], {[], []}}}, Set2).
 
 equal_test() ->
     Set0 = {?TYPE, {[], {[<<"a">>, <<"b">>, <<"c">>], []}}},

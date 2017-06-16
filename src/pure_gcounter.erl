@@ -35,7 +35,7 @@
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
--export([new/0, new/1]).
+-export([new/0, new/1, is_commutative/0]).
 -export([mutate/3, query/1, equal/2, reset/2]).
 
 -export_type([pure_gcounter/0, pure_gcounter_op/0]).
@@ -54,20 +54,19 @@ new() ->
 new([]) ->
     new().
 
+%% check if dt is commutative.
+-spec is_commutative() -> boolean().
+is_commutative() -> true.
+
 %% @doc Update a `pure_gcounter()'.
 -spec mutate(pure_gcounter_op(), pure_type:id(), pure_gcounter()) ->
     {ok, pure_gcounter()}.
-mutate(increment, _VV, {?TYPE, {POLog, PureGCounter}}) ->
+mutate(increment, _TS, {?TYPE, {POLog, PureGCounter}}) ->
     PureGCounter1 = {?TYPE, {POLog, PureGCounter + 1}},
     {ok, PureGCounter1};
-mutate({increment, Val}, _VV, {?TYPE, {POLog, PureGCounter}}) ->
+mutate({increment, Val}, _TS, {?TYPE, {POLog, PureGCounter}}) ->
     PureGCounter1 = {?TYPE, {POLog, PureGCounter + Val}},
     {ok, PureGCounter1}.
-
-%% @doc Clear/reset the state to initial state.
--spec reset(pure_type:id(), pure_gcounter()) -> pure_gcounter().
-reset(VV, {?TYPE, _}=CRDT) ->
-    pure_type:reset(VV, CRDT).
 
 %% @doc Return the value of the `pure_gcounter()'.
 -spec query(pure_gcounter()) -> non_neg_integer().
@@ -101,11 +100,6 @@ increment_test() ->
     ?assertEqual({?TYPE, {[], 1}}, PureGCounter1),
     ?assertEqual({?TYPE, {[], 2}}, PureGCounter2),
     ?assertEqual({?TYPE, {[], 7}}, PureGCounter3).
-
-reset_test() ->
-    PureGCounter1 = {?TYPE, {[], 15}},
-    PureGCounter2 = reset([], PureGCounter1),
-    ?assertEqual({?TYPE, {[], 0}}, PureGCounter2).
 
 equal_test() ->
     PureGCounter1 = {?TYPE, {[], 1}},

@@ -35,7 +35,7 @@
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
--export([new/0, new/1]).
+-export([new/0, new/1, is_commutative/0]).
 -export([mutate/3, query/1, equal/2, reset/2]).
 
 -export_type([pure_pncounter/0, pure_pncounter_op/0]).
@@ -54,26 +54,25 @@ new() ->
 new([]) ->
     new().
 
+%% check if dt is commutative.
+-spec is_commutative() -> boolean().
+is_commutative() -> true.
+
 %% @doc Update a `pure_pncounter()'.
 -spec mutate(pure_pncounter_op(), pure_type:id(), pure_pncounter()) ->
     {ok, pure_pncounter()}.
-mutate(increment, _VV, {?TYPE, {POLog, PurePNCounter}}) ->
+mutate(increment, _TS, {?TYPE, {POLog, PurePNCounter}}) ->
     PurePNCounter1 = {?TYPE, {POLog, PurePNCounter + 1}},
     {ok, PurePNCounter1};
-mutate({increment, Val}, _VV, {?TYPE, {POLog, PurePNCounter}}) ->
+mutate({increment, Val}, _TS, {?TYPE, {POLog, PurePNCounter}}) ->
     PurePNCounter1 = {?TYPE, {POLog, PurePNCounter + Val}},
     {ok, PurePNCounter1};
-mutate(decrement, _VV, {?TYPE, {POLog, PurePNCounter}}) ->
+mutate(decrement, _TS, {?TYPE, {POLog, PurePNCounter}}) ->
     PurePNCounter1 = {?TYPE, {POLog, PurePNCounter - 1}},
     {ok, PurePNCounter1};
-mutate({decrement, Val}, _VV, {?TYPE, {POLog, PurePNCounter}}) ->
+mutate({decrement, Val}, _TS, {?TYPE, {POLog, PurePNCounter}}) ->
     PurePNCounter1 = {?TYPE, {POLog, PurePNCounter - Val}},
     {ok, PurePNCounter1}.
-
-%% @doc Clear/reset the state to initial state.
--spec reset(pure_type:id(), pure_pncounter()) -> pure_pncounter().
-reset(VV, {?TYPE, _}=CRDT) ->
-    pure_type:reset(VV, CRDT).
 
 %% @doc Return the value of the `pure_pncounter()'.
 -spec query(pure_pncounter()) -> integer().
@@ -118,11 +117,6 @@ decrement_test() ->
     ?assertEqual({?TYPE, {[], -1}}, PurePNCounter2),
     ?assertEqual({?TYPE, {[], -6}}, PurePNCounter3),
     ?assertEqual({?TYPE, {[], 2}}, PurePNCounter4).
-
-reset_test() ->
-    PurePNCounter1 = {?TYPE, {[], 54}},
-    PurePNCounter2 = reset([], PurePNCounter1),
-    ?assertEqual({?TYPE, {[], 0}}, PurePNCounter2).
 
 equal_test() ->
     PurePNCounter1 = {?TYPE, {[], 1}},
