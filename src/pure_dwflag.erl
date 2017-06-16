@@ -38,7 +38,7 @@
 -include_lib("eunit/include/eunit.hrl").
 -endif.
 
--export([new/0, new/1]).
+-export([new/0, new/1, is_commutative/0]).
 -export([mutate/3, query/1, equal/2, reset/2]).
 -export([redundant/2, remove_redundant_crystal/2, remove_redundant_polog/2, check_stability/2]).
 
@@ -58,6 +58,10 @@ new() ->
 -spec new([term()]) -> pure_dwflag().
 new([]) ->
     new().
+
+%% check if dt is commutative.
+-spec is_commutative() -> boolean().
+is_commutative() -> false.
 
 %% @doc Check redundancy `pure_dwflag()'
 %% Called in remove_redundant().
