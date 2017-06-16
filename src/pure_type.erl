@@ -28,7 +28,7 @@
               id/0,
               element/0]).
 
--export([reset/2]).
+-export([is_commutative/0]).
 -export([crdt_size/1]).
 
 %% Define some initial types.
@@ -42,25 +42,14 @@
                      ?PURE_RWSET_TYPE |
                      ?PURE_TWOPSET_TYPE.
 -type crdt() :: {pure_type(), payload()}.
--type payload() :: {polog(), term()}.
+-type payload() :: {polog(), term()} | term().
 -type polog() :: orddict:orddict().
--type id() :: orddict:orddict().
+-type id() :: orddict:orddict() | term().
 -type element() :: term().
 
-%% Reset the data type
--callback reset(pure_type:id(), crdt()) -> crdt().
 
-%% @doc Clear/reset the state to initial state.
--spec reset(pure_type:id(), crdt()) -> crdt().
-reset(VV, {Type, {POLog, _Crystal}}) ->
-    {Type, {_POLog, Crystal}} = Type:new(),
-    POLog1 = orddict:filter(
-        fun(VV1, _Op) ->
-            not pure_trcb:happened_before(VV1, VV)
-        end,
-        POLog
-    ),
-    {Type, {POLog1, Crystal}}.
+%% check if dt is commutative.
+-callback is_commutative() -> boolean().
 
 %% @doc Term size.
 crdt_size({?PURE_AWSET_TYPE, CRDT}) -> crdt_size(CRDT);

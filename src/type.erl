@@ -27,7 +27,7 @@
               error/0]).
 
 %% Define some initial types.
--type type() :: pure_type:pure_type() | dotted_type:dotted_type().
+-type type() :: pure_type:pure_type().
 -type payload() :: term().
 -type crdt() :: {type(), payload()}.
 -type operation() :: term().
