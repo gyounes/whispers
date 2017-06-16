@@ -39,7 +39,7 @@
 -endif.
 
 -export([new/0, new/1, is_commutative/0]).
--export([mutate/3, query/1, equal/2, reset/2]).
+-export([mutate/3, query/1, equal/2]).
 -export([redundant/2, remove_redundant_crystal/2, remove_redundant_polog/2, check_stability/2]).
 
 -export_type([pure_awset/0, pure_awset_op/0]).
@@ -132,11 +132,6 @@ mutate({rmv, Elem}, VV, {?TYPE, {POLog, AWSet}}) ->
     {_, {?TYPE, {POLog0, AWSet0}}} = pure_polog:remove_redundant({VV, {rmv, Elem}}, {?TYPE, {POLog, AWSet}}),
     {ok, {?TYPE, {POLog0, AWSet0}}}.
 
-%% @doc Clear/reset the state to initial state.
--spec reset(pure_type:id(), pure_awset()) -> pure_awset().
-reset(VV, {?TYPE, _}=CRDT) ->
-    pure_type:reset(VV, CRDT).
-
 %% @doc Returns the value of the `pure_awset()'.
 %%      This value is a set with all the elements in the `pure_awset()'.
 -spec query(pure_awset()) -> sets:set(pure_type:element()).
@@ -163,9 +158,7 @@ new_test() ->
 
 redundant_test() ->
     ?assertEqual(?AA, redundant({[{0, 0}, {1, 0}], {add, <<"a">>}}, {[{0, 1}, {1, 1}], {add, <<"b">>}})),
-    ?assertEqual(?RA, redundant({[{0, 0}, {1, 0}], {add, <<"a">>}}, {[{0, 1}, {1, 1}], {add, <<"a">>}})),
-    ?assertEqual(?AA, redundant({[{0, 0}, {1, 0}], {add, <<"a">>}}, {[{0, 0}, {1, 0}], {add, <<"a">>}})).
-
+    ?assertEqual(?RA, redundant({[{0, 0}, {1, 0}], {add, <<"a">>}}, {[{0, 1}, {1, 1}], {add, <<"a">>}})).
 remove_redundant_crystal_test() ->
     {Redundant0, {?TYPE, {_POLog0, AWORSet0}}} = remove_redundant_crystal({[{0, 1}, {1, 2}, {2, 3}], {add, <<"a">>}}, {?TYPE, {[{0, 1}], [<<"a">>, <<"b">>, <<"c">>]}}),
     ?assertEqual(true, Redundant0),
@@ -213,11 +206,6 @@ rmv_test() ->
     ?assertEqual({?TYPE, {[{[{0, 1}], {add, <<"a">>}}], []}}, Set4),
     ?assertEqual({?TYPE, {[{[{0, 1}], {add, <<"a">>}}], []}}, Set5),
     ?assertEqual({?TYPE, {[], []}}, Set3).
-
-reset_test() ->
-    Set1 = {?TYPE, {[{[{0, 1}, {1, 2}], {add, <<"b">>}}, {[{0, 3}, {1, 4}], {add, <<"c">>}}, {[{0, 6}, {1, 5}], {add, <<"d">>}}], [<<"a">>]}},
-    Set2 = reset([{0, 5}, {1, 6}], Set1),
-    ?assertEqual({?TYPE, {[{[{0, 6}, {1, 5}], {add, <<"d">>}}], []}}, Set2).
 
 check_stability_test() ->
     Set0 = new(),

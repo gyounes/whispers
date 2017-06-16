@@ -28,7 +28,6 @@
               id/0,
               element/0]).
 
--export([is_commutative/0]).
 -export([crdt_size/1]).
 
 %% Define some initial types.

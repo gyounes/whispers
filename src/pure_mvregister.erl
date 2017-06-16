@@ -39,7 +39,7 @@
 -endif.
 
 -export([new/0, new/1, is_commutative/0]).
--export([mutate/3, query/1, equal/2, reset/2]).
+-export([mutate/3, query/1, equal/2]).
 -export([redundant/2, remove_redundant_crystal/2, remove_redundant_polog/2, check_stability/2]).
 
 -export_type([pure_mvregister/0, pure_mvregister_op/0]).
@@ -123,11 +123,6 @@ mutate({Op, _Timestamp, Value}, VV, {?TYPE, {POLog, PureMVReg}}) ->
     {_Add, {?TYPE, {POLog0, PureMVReg0}}} = pure_polog:remove_redundant({VV, {Op, Value}}, {?TYPE, {POLog, PureMVReg}}),
     {ok, {?TYPE, {orddict:store(VV, Value, POLog0), PureMVReg0}}}.
 
-%% @doc Clear/reset the state to initial state.
--spec reset(pure_type:id(), pure_mvregister()) -> pure_mvregister().
-reset(VV, {?TYPE, _}=CRDT) ->
-    pure_type:reset(VV, CRDT).
-
 %% @doc Returns the value of the `pure_mvregister()'.
 -spec query(pure_mvregister()) -> sets:set(value()).
 query({?TYPE, {POLog0, _PureMVReg0}}) ->
@@ -168,11 +163,6 @@ mutate_test() ->
     {ok, MVReg2} = mutate({set, Timestamp, "bar"}, [{0, 2}, {1, 2}], MVReg1),
     ?assertEqual({?TYPE, {[{[{0, 1}, {1, 1}], "foo"}], []}}, MVReg1),
     ?assertEqual({?TYPE, {[{[{0, 2}, {1, 2}], "bar"}], []}}, MVReg2).
-
-reset_test() ->
-    MVReg1 = {?TYPE, {[{[{0, 1}, {1, 3}], "bar"}, {[{0, 2}, {1, 1}], "baz"}], []}},
-    MVReg2 = reset([{0, 5}, {1, 6}], MVReg1),
-    ?assertEqual({?TYPE, {[], []}}, MVReg2).
 
 check_stability_test() ->
     MVReg0 = new(),

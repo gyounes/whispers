@@ -100,7 +100,7 @@ query({pure_awset, {POLog0, _Crystal}}) ->
                 fun(Key1, {Op1, El1}, Acc1) ->
                     case El0 =:= El1 andalso Op0 =:= add andalso Op1 =:= rmv of
                         true ->
-                            Acc1 andalso not pure_trcb:happened_before(Key0, Key1);
+                            Acc1 andalso not vclock:descends(Key1, Key0);
                         false ->
                             Acc1
                     end
@@ -125,7 +125,7 @@ query({pure_rwset, {POLog0, _Crystal}}) ->
                 fun(Key1, {Op1, El1}, Acc1) ->
                     case El0 =:= El1 andalso Op0 =:= add andalso Op1 =:= rmv of
                         true ->
-                            Acc1 andalso pure_trcb:happened_before(Key1, Key0);
+                            Acc1 andalso vclock:descends(Key0, Key1);
                         false ->
                             Acc1
                     end
@@ -148,7 +148,7 @@ query({pure_ewflag, {POLog0, _Crystal}}) ->
         fun(Key0, Op0, Acc0) ->
             case orddict:fold(
                 fun(Key1, _Op1, Acc1) ->
-                    Acc1 andalso not pure_trcb:happened_before(Key0, Key1)
+                    Acc1 andalso not vclock:descends(Key1, Key0)
                 end,
                 true,
                 POLog0
@@ -179,7 +179,7 @@ query({pure_dwflag, {POLog0, _Crystal}}) ->
                         fun(Key1, Op1, Acc1) ->
                             case Op0 =:= enable andalso Op1 =:= disable of
                                 true ->
-                                    Acc1 andalso pure_trcb:happened_before(Key1, Key0);
+                                    Acc1 andalso vclock:descends(Key0, Key1);
                                 false ->
                                     Acc1
                             end
@@ -208,7 +208,7 @@ query({pure_mvregister, {POLog0, _Crystal}}) ->
         fun(Key0, Op0, Acc0) ->
             case orddict:fold(
                 fun(Key1, _Op1, Acc1) ->
-                    Acc1 andalso not pure_trcb:happened_before(Key0, Key1)
+                    Acc1 andalso not vclock:descends(Key1, Key0)
                 end,
                 true,
                 POLog0

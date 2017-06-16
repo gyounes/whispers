@@ -39,7 +39,7 @@
 -endif.
 
 -export([new/0, new/1, is_commutative/0]).
--export([mutate/3, query/1, equal/2, reset/2]).
+-export([mutate/3, query/1, equal/2]).
 -export([redundant/2, remove_redundant_crystal/2, remove_redundant_polog/2, check_stability/2]).
 
 -export_type([pure_ewflag/0, pure_ewflag_op/0]).
@@ -132,11 +132,6 @@ mutate(Op, VV, {?TYPE, {POLog, PureEWFlag}}) ->
             {ok, {?TYPE, {orddict:store(VV, Op, POLog0), PureEWFlag0}}}
     end.
 
-%% @doc Clear/reset the state to initial state.
--spec reset(pure_type:id(), pure_ewflag()) -> pure_ewflag().
-reset(VV, {?TYPE, _}=CRDT) ->
-    pure_type:reset(VV, CRDT).
-
 %% @doc Returns the value of the `pure_ewflag()'.
 %%      This value is a a boolean value in the `pure_ewflag()'.
 -spec query(pure_ewflag()) -> boolean().
@@ -188,11 +183,6 @@ mutate_test() ->
     ?assertEqual({?TYPE, {[{[{0, 2}, {1, 2}], enable}], false}}, Flag2),
     ?assertEqual({?TYPE, {[{[{0, 2}, {1, 2}], enable}, {[{0, 4}, {1, 1}], enable}], false}}, Flag3),
     ?assertEqual({?TYPE, {[{[{0, 4}, {1, 1}], enable}], false}}, Flag4).
-
-reset_test() ->
-    Flag1 = {?TYPE, {[{[{0, 2}, {1, 2}], enable}, {[{0, 4}, {1, 1}], enable}], true}},
-    Flag2 = reset([{0, 5}, {1, 6}], Flag1),
-    ?assertEqual({?TYPE, {[], false}}, Flag2).
 
 check_stability_test() ->
     Flag0 = new(),

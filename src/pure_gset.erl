@@ -36,7 +36,7 @@
 -endif.
 
 -export([new/0, new/1, is_commutative/0]).
--export([mutate/3, query/1, equal/2, reset/2]).
+-export([mutate/3, query/1, equal/2]).
 
 -export_type([pure_gset/0, pure_gset_op/0]).
 
